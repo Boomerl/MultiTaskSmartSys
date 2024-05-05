@@ -11,14 +11,15 @@
 #include <NvInfer.h>
 #include <NvOnnxParser.h>
 #include "logger.h"
-#include "base_engine.h"
+#include "base_model.h"
 
+using namespace std;
 using namespace nvinfer1;
 
-class TRTModel : public baseEngine {
+class TRTModel : public BaseModel {
 public:
     TRTModel(string task, string model_path, string in_name, string out_name, int batch_size,
-             int in_channel, int in_height, int in_width, int num_classes);
+             int in_channel, int in_height, int in_width, int num_classes, float threshold);
 
     ~TRTModel();
 
@@ -36,7 +37,7 @@ private:
     const int IN_HEIGHT; // input height
     const int IN_WIDTH; // input width
     const int NUM_CLASSES; // number of classes
-    const float threshold = 0.8; // threshold
+    const float threshold; // threshold
 
     cudaStream_t stream;
     IRuntime *runtime; // runtime

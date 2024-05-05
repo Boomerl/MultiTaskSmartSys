@@ -8,8 +8,6 @@
 #include <iostream>
 #include <vector>
 
-using namespace std;
-
 #define CHECK(status) \
     do\
     {\
@@ -22,15 +20,15 @@ using namespace std;
     } while (0)
 
 
-class baseEngine {
+class BaseModel {
 public:
-    baseEngine() = default;
+    BaseModel() = default;
 
-    virtual ~baseEngine() { std::cout << "destroy baseEngine done" << std::endl; };
+    virtual ~BaseModel() { std::cout << "destroy BaseModel done" << std::endl; };
 
-    virtual void infer(const vector<float> &input, vector<float> &output) = 0;
+    virtual void infer(const std::vector<float> &input, std::vector<float> &output) = 0;
 
-    virtual void process_output(const vector<float> &output) = 0;
+    virtual void process_output(const std::vector<float> &output) = 0;
 };
 
 #endif //DEPLOY_BASE_ENGINE_H

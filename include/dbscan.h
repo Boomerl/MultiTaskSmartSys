@@ -5,6 +5,8 @@
 #ifndef DEMO_SHOW_DBSCAN_H
 #define DEMO_SHOW_DBSCAN_H
 
+#include <pcl/point_types.h>  // PCL库中定义的点类型
+#include <pcl/kdtree/kdtree_flann.h>  // PCL库中的Kd树搜索方法
 #include "point.h"
 #include "point_data_source.h"
 
@@ -24,7 +26,7 @@ namespace dbscan {
         ~DBSCAN() {}
 
         std::vector<std::vector<size_t>> GetClusterPointSet() {
-            std::vector<std::vector<size_t>> cluster;   // 存储最终聚类的结果
+            std::vector<std::vector<size_t>> cluster;   // 存储最终聚类的结果(索引)
             std::vector<size_t> kernelObj;  // 存储核心对象的索引
             neighbourPoints.resize(pointCloud.size());
             neighbourDistance.resize(pointCloud.size());
@@ -96,6 +98,6 @@ namespace dbscan {
             }
         }
     };
-
+} // namespace dbscan
 
 #endif //DEMO_SHOW_DBSCAN_H

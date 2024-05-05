@@ -10,7 +10,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Release)
 
 find_package(CUDA REQUIRED)
-find_package(GTest)
+find_package(PCL 1.2 REQUIRED)
+#find_package(GTest)
 
 # ===== cuda =====
 include_directories(${CUDA_INCLUDE_DIRS})
@@ -18,9 +19,13 @@ link_directories(/usr/local/cuda-11.4/lib64)
 # ===== tensorrt =====
 include_directories(/usr/include/aarch64-linux-gnu/)
 link_directories(/usr/lib/aarch64-linux-gnu/)
+# ===== pcl =====
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
 # ===== main =====
 aux_source_directory(${PROJECT_SOURCE_DIR}/src M_SRC_DIR)
 include_directories(${PROJECT_SOURCE_DIR}/include)
 # ===== build =====
 add_executable(demo ${M_SRC_DIR} demo.cpp)
-target_link_libraries(demo ${CUDA_LIBS} cudart nvinfer gtest_main gtest)
+target_link_libraries(demo ${CUDA_LIBS} ${PCL_LIBRARIES} cudart nvinfer gtest_main gtest)

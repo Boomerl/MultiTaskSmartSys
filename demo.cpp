@@ -15,18 +15,12 @@ int main() {
     vector<string> paths = {"/home/zzy/workspace/mmw/smart_home/engines/gesture.trt",
                             "/home/zzy/workspace/mmw/smart_home/engines/action.trt"};
     // models
-    vector<baseEngine *> models(2);
-    baseEngine *model1 = new TRTModel("gesture", paths[0], "input", "output", 1, 1, 30, 30, 5);
-    baseEngine *model2 = new TRTModel("action", paths[0], "input", "output", 1, 1, 30, 30, 4);
+    vector<BaseModel *> models(2);
+    BaseModel *model1 = new TRTModel("gesture", paths[0], "input", "output", 1, 1, 30, 30, 5, 0.8);
+    BaseModel *model2 = new TRTModel("action", paths[0], "input", "output", 1, 1, 30, 30, 4, 0.8);
     models[0] = model1;
     models[1] = model2;
-    //
-    vector<vector<int>> shapes = {{1, 1, 30, 30},
-                                  {1, 1, 30, 30}};  // (N, C, H, W)
     vector<int> classes = {5, 4};
-    float action_thresh = 0.90;
-    float gesture_thresh = 0.10;
-
     // create multi-task object
     MultiTask task(config, port, baud_rate, classes, models);
     cout << "===== Start run multi-task =====" << endl;

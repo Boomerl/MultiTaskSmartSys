@@ -5,9 +5,10 @@
 #include "trt_model.h"
 
 TRTModel::TRTModel(string task, string model_path, string in_name, string out_name,
-                   int batch_size, int in_channel, int in_height, int in_width, int num_classes)
+                   int batch_size, int in_channel, int in_height, int in_width, int num_classes, float threshold)
         : task(task), model_path(model_path), in_name(in_name), out_name(out_name), BATCH_SIZE(batch_size),
-          IN_CHANNEL(in_channel), IN_HEIGHT(in_height), IN_WIDTH(in_width), NUM_CLASSES(num_classes) {
+          IN_CHANNEL(in_channel), IN_HEIGHT(in_height), IN_WIDTH(in_width), NUM_CLASSES(num_classes),
+          threshold(threshold) {
     // create logger
     Logger gLogger;
     // create runtime
@@ -38,6 +39,7 @@ TRTModel::TRTModel(string task, string model_path, string in_name, string out_na
     CHECK(cudaStreamCreate(&stream));
     CHECK(cudaMalloc(&buffers[inputIndex], BATCH_SIZE * IN_CHANNEL * IN_HEIGHT * IN_WIDTH * sizeof(float)));
     CHECK(cudaMalloc(&buffers[outputIndex], BATCH_SIZE * NUM_CLASSES * sizeof(float)));
+    std::cout << "create TRTModel done" << std::endl;
 }
 
 TRTModel::~TRTModel() {

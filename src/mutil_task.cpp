@@ -5,8 +5,10 @@
 #include "multi_task.h"
 
 MultiTask::MultiTask(const string &config_file, const string &port, int baud_rate, vector<int> &num_classes,
-                     vector<baseEngine *> &models)
+                     vector<BaseModel *> &models)
         : config_file(config_file), port(port), baud_rate(baud_rate), num_classes(num_classes), models(models) {
+    // create track model
+    track_model = new TrackModel("track", 0.5, 5);
     // create serial parser
     parser = new SerialParser(config_file.c_str(), port.c_str(), baud_rate);
 
@@ -25,6 +27,7 @@ MultiTask::MultiTask(const string &config_file, const string &port, int baud_rat
     }
     // create threads
     t_pre = thread(&MultiTask::prepare_input, this);
+    t_track = thread(&MultiTask::track, this);
     for (int i = 0; i < num_tasks; i++) {
         t_infer[i] = thread(&MultiTask::infer, this, i);
         t_res[i] = thread(&MultiTask::res, this, i);
@@ -39,6 +42,7 @@ MultiTask::~MultiTask() {
     for (auto &model: models) {
         delete model;
     }
+    delete track_model;
     // notify all threads
     for (auto &cv: cv_infers) {
         cv->notify_all();
@@ -49,6 +53,8 @@ MultiTask::~MultiTask() {
     // join threads
     if (t_pre.joinable())
         t_pre.join();
+    if (t_track.joinable())
+        t_track.join();
     for (int i = 0; i < t_infer.size(); i++) {
         if (t_infer[i].joinable())
             t_infer[i].join();
@@ -72,9 +78,12 @@ void MultiTask::run() {
             this_thread::sleep_for(chrono::milliseconds(10));
             continue;
         }
+        // track
+        track_ready = true;
+        cv_track.notify_one();
         // push frame
         unique_lock<mutex> lck(mtx_frames);
-        frames.push_back(frame);
+        frames.emplace_back(frame);
         lck.unlock();
         cv_pre.notify_one();
         // sleep
@@ -129,6 +138,15 @@ void MultiTask::infer(int id) {
         // sleep
         this_thread::sleep_for(chrono::milliseconds(10));
     }
+}
+
+void MultiTask::track() {
+    unique_lock<mutex> lck(mtx_frames);
+    while (!track_ready) {
+        cv_track.wait(lck);
+    }
+    track_ready = false;
+    track_model->infer(frames.back());
 }
 
 void MultiTask::res(int id) {
