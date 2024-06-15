@@ -21,7 +21,7 @@ public:
     TRTModel(string task, string model_path, string in_name, string out_name, int batch_size,
              int in_channel, int in_height, int in_width, int num_classes, float threshold);
 
-    ~TRTModel();
+    ~TRTModel() override;
 
     void infer(const vector<float> &input, vector<float> &output) override;
 

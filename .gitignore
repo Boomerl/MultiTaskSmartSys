@@ -3,4 +3,6 @@
 
 # cmake
 /cmake-build-debug-xavier/
-/save_weights/
+
+# build
+/build/
